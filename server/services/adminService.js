@@ -3,13 +3,25 @@ import { db, auth } from '../config/firebase.js';
 // Signup: Create Firebase Auth admin and store profile in Firestore
 const signupAdmin = async (email, password, adminData) => {
   try {
-    // Create admin in Firebase Auth
-    const adminRecord = await auth.createUser({
-      email,
-      password,
-    });
-
-    const uid = adminRecord.uid;
+    let uid;
+    let wasExistingUser = false;
+    try {
+      // Check if user already exists
+      const userRecord = await auth.getUserByEmail(email);
+      uid = userRecord.uid;
+      wasExistingUser = true;
+    } catch (e) {
+      if (e.code === 'auth/user-not-found') {
+        // Create new user in Firebase Auth
+        const adminRecord = await auth.createUser({
+          email,
+          password,
+        });
+        uid = adminRecord.uid;
+      } else {
+        throw e;
+      }
+    }
 
     // Attach custom claim to designate this user as an admin
     await auth.setCustomUserClaims(uid, { admin: true });
@@ -22,7 +34,7 @@ const signupAdmin = async (email, password, adminData) => {
       createdAt: new Date(),
     });
 
-    return { success: true, uid, email, firstName: adminData.firstName, lastName: adminData.lastName };
+    return { success: true, uid, email, firstName: adminData.firstName, lastName: adminData.lastName, wasExistingUser };
   } catch (error) {
     throw new Error(`Failed to sign up admin: ${error.message}`, { cause: error });
   }

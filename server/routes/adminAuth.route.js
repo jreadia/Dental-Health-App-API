@@ -29,6 +29,7 @@ router.post('/api/v1/auth/admins/register', authLimiter, async (req, res) => {
         firstName: result.firstName,
         lastName: result.lastName,
         email: result.email,
+        wasExistingUser: result.wasExistingUser,
       },
     });
   } catch (error) {
