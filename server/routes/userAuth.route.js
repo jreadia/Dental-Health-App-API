@@ -97,8 +97,6 @@ router.post('/api/v1/auth/users/login', authLimiter, async (req, res) => {
     // Fetch user profile from Firestore
     const userProfile = await getUser(uid);
 
-    const isProduction = process.env.NODE_ENV === 'production';
-
     // Set HTTP-only cookie
     res.cookie('token', idToken, {
       httpOnly: true,

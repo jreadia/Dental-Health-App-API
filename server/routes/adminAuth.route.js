@@ -94,8 +94,6 @@ router.post('/api/v1/auth/admins/login', authLimiter, async (req, res) => {
     // Fetch admin profile from Firestore
     const adminProfile = await getAdmin(uid);
 
-    const isProduction = process.env.NODE_ENV === 'production';
-
     // Set HTTP-only cookie
     res.cookie('token', idToken, {
       httpOnly: true,
