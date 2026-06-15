@@ -53,7 +53,8 @@ router.post('/api/v1/dental-images', verifyFirebaseToken, mlLimiter, upload.sing
       calculus_detected,
       calculus_amount,
       oral_health_status,
-      highest_confidence,
+      average_confidence,
+      highest_confidence, // fallback for backwards compatibility
       detections
     } = mlResponse.data;
 
@@ -71,7 +72,7 @@ router.post('/api/v1/dental-images', verifyFirebaseToken, mlLimiter, upload.sing
       calculusDetected: calculus_detected === "Yes" || calculus_detected === true,
       calculusAmount: calculus_amount || 0,
       overall_diagnosis: oral_health_status || "Unknown",
-      highestConfidence: highest_confidence || 0,
+      averageConfidence: average_confidence !== undefined ? average_confidence : (highest_confidence || 0),
       boxes: Array.isArray(detections) ? detections.map(d => ({
         confidence: d.confidence,
         bbox: d.bbox

@@ -50,7 +50,7 @@ jest.unstable_mockModule('axios', () => ({
         calculus_detected: "No",
         calculus_amount: 0,
         oral_health_status: "Healthy",
-        highest_confidence: 0.95,
+        average_confidence: 0.95,
         detections: []
       }
     })
@@ -106,7 +106,7 @@ describe('Dental Images Routes', () => {
           calculusDetected: false,
           calculusAmount: 0,
           overall_diagnosis: 'Healthy',
-          highestConfidence: 0.95,
+          averageConfidence: 0.95,
           boxes: []
         }
       }));
