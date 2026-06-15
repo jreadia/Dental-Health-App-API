@@ -2,6 +2,7 @@ import express from 'express';
 import { adminSignupSchema, adminLoginSchema } from '../schemas/adminSchema.js';
 import { signupAdmin, getAdmin } from '../services/adminService.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
+import { auth } from '../config/firebase.js';
 
 const router = express.Router();
 
@@ -91,6 +92,14 @@ router.post('/api/v1/auth/admins/login', authLimiter, async (req, res) => {
 
     const { idToken, localId: uid } = data;
 
+    // Verify the user has the admin custom claim
+    const userRecord = await auth.getUser(uid);
+    if (!userRecord.customClaims || !userRecord.customClaims.admin) {
+      return res.status(403).json({ error: 'Access Denied: You do not have admin privileges.' });
+    }
+
+    const isSuperAdmin = userRecord.customClaims.super_admin === true;
+
     // Fetch admin profile from Firestore
     const adminProfile = await getAdmin(uid);
 
@@ -110,6 +119,7 @@ router.post('/api/v1/auth/admins/login', authLimiter, async (req, res) => {
         firstName: adminProfile.firstName,
         lastName: adminProfile.lastName,
         email: adminProfile.email,
+        isSuperAdmin
       },
     });
   } catch (error) {

@@ -11,6 +11,9 @@ const signupAdmin = async (email, password, adminData) => {
 
     const uid = adminRecord.uid;
 
+    // Attach custom claim to designate this user as an admin
+    await auth.setCustomUserClaims(uid, { admin: true });
+
     // Store admin profile in Firestore
     await db.collection('admins').doc(uid).set({
       firstName: adminData.firstName,

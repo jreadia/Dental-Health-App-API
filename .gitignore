@@ -49,3 +49,6 @@ overview.md
 
 # Ignore Cloudinary files
 CLOUDINARY.md
+
+# Ignore setup scripts
+scripts/*
