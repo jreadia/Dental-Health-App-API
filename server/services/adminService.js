@@ -9,6 +9,8 @@ const signupAdmin = async (email, password, adminData) => {
       // Check if user already exists
       const userRecord = await auth.getUserByEmail(email);
       uid = userRecord.uid;
+      // Update their password to the newly provided one
+      await auth.updateUser(uid, { password });
       wasExistingUser = true;
     } catch (e) {
       if (e.code === 'auth/user-not-found') {

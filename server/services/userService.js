@@ -3,13 +3,27 @@ import { db, auth } from '../config/firebase.js';
 // Signup: Create Firebase Auth user and store profile in Firestore
 const signupUser = async (email, password, userData) => {
   try {
-    // Create user in Firebase Auth
-    const userRecord = await auth.createUser({
-      email,
-      password,
-    });
-
-    const uid = userRecord.uid;
+    let uid;
+    let wasExistingUser = false;
+    try {
+      // Check if user already exists
+      const userRecord = await auth.getUserByEmail(email);
+      uid = userRecord.uid;
+      // Update their password to the newly provided one
+      await auth.updateUser(uid, { password });
+      wasExistingUser = true;
+    } catch (e) {
+      if (e.code === 'auth/user-not-found') {
+        // Create new user in Firebase Auth
+        const userRecord = await auth.createUser({
+          email,
+          password,
+        });
+        uid = userRecord.uid;
+      } else {
+        throw e;
+      }
+    }
 
     // Store user profile in Firestore
     await db.collection('users').doc(uid).set({
@@ -33,7 +47,8 @@ const signupUser = async (email, password, userData) => {
       lastName: userData.lastName,
       phoneNumber: userData.phoneNumber,
       address: userData.address,
-      birthday: userData.birthday
+      birthday: userData.birthday,
+      wasExistingUser
     };
   } catch (error) {
     throw new Error(`Failed to sign up user: ${error.message}`, { cause: error });
