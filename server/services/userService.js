@@ -123,7 +123,15 @@ const getUserStats = async () => {
 // Update user
 const updateUser = async (userId, userData) => {
   try {
+    // Update Firestore
     await db.collection('users').doc(userId).update(userData);
+    
+    // Sync status to Firebase Auth
+    if (userData.status) {
+      const isDisabled = userData.status === 'INACTIVE' || userData.status === 'BANNED';
+      await auth.updateUser(userId, { disabled: isDisabled });
+    }
+    
     return { success: true, userId };
   } catch (error) {
     throw new Error(`Failed to update user: ${error.message}`, { cause: error });
