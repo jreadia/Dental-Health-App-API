@@ -43,17 +43,12 @@ const getDentalImage = async (imageId) => {
 };
 
 // Get all images for a user
-const getUserImages = async (userId, limitNum) => {
+const getUserImages = async (userId) => {
   try {
-    let query = db.collection('dental_images')
+    const snapshot = await db.collection('dental_images')
       .where('userId', '==', userId)
-      .orderBy('uploadDate', 'desc');
-
-    if (limitNum) {
-      query = query.limit(parseInt(limitNum, 10));
-    }
-
-    const snapshot = await query.get();
+      .orderBy('uploadDate', 'desc')
+      .get();
 
     const images = [];
     snapshot.forEach((doc) => {

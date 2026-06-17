@@ -3,7 +3,7 @@ import upload from '../middleware/upload.js';
 import verifyFirebaseToken from '../middleware/token.js';
 import { mlLimiter } from '../middleware/rateLimiter.js';
 import cloudinary from '../config/cloudinary.js';
-import { createDentalImage, getUserImages } from '../services/dentalImageService.js';
+import { createDentalImage, getUserImages, getDentalImage } from '../services/dentalImageService.js';
 import { dentalImageCreateSchema } from '../schemas/dentalImageSchema.js';
 import axios from 'axios';
 import FormData from 'form-data';
@@ -165,6 +165,29 @@ router.get('/api/v1/dental-images', verifyFirebaseToken, async (req, res) => {
   } catch (error) {
     console.error('Fetch history error:', error);
     return res.status(500).json({ error: 'Failed to retrieve history' });
+  }
+});
+
+// GET /api/v1/dental-images/:imageId - Get specific image details
+router.get('/api/v1/dental-images/:imageId', verifyFirebaseToken, async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const { imageId } = req.params;
+    
+    const image = await getDentalImage(imageId);
+    
+    // Security check: ensure the image belongs to the requesting user
+    if (image.userId !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to access this image' });
+    }
+    
+    return res.status(200).json({ success: true, data: image });
+  } catch (error) {
+    console.error('Fetch specific image error:', error);
+    if (error.message === 'Dental image not found') {
+      return res.status(404).json({ error: error.message });
+    }
+    return res.status(500).json({ error: 'Failed to retrieve image details' });
   }
 });
 

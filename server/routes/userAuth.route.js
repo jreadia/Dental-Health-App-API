@@ -161,7 +161,7 @@ router.post('/api/v1/auth/users/forgot-password', authLimiter, async (req, res, 
       if (userDoc.exists && adminDoc.exists) {
         isSharedAccount = true;
       }
-    } catch (e) {
+    } catch {
       // If user doesn't exist, ignore the error and proceed to the Identity Toolkit call
       // to return a generic success message to prevent email enumeration.
     }
