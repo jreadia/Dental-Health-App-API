@@ -159,7 +159,8 @@ router.post('/api/v1/dental-images', verifyFirebaseToken, mlLimiter, upload.sing
 router.get('/api/v1/dental-images', verifyFirebaseToken, async (req, res) => {
   try {
     const userId = req.user.uid;
-    const images = await getUserImages(userId);
+    const limit = req.query.limit;
+    const images = await getUserImages(userId, limit);
     return res.status(200).json({ success: true, data: images });
   } catch (error) {
     console.error('Fetch history error:', error);
