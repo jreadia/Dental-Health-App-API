@@ -96,6 +96,11 @@ router.post('/api/v1/auth/users/login', authLimiter, async (req, res) => {
 
     // Fetch user profile from Firestore
     const userProfile = await getUser(uid);
+    
+    // Block inactive or banned users
+    if (userProfile.status === 'INACTIVE' || userProfile.status === 'BANNED') {
+      return res.status(403).json({ error: 'Account disabled', details: 'Your account has been deactivated by an administrator.' });
+    }
 
     // Set HTTP-only cookie
     res.cookie('token', idToken, {
