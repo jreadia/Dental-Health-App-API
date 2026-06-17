@@ -72,7 +72,8 @@ router.delete('/api/v1/users/:userId', async (req, res) => {
 // GET /api/v1/users/:userId/dental-images - Get a specific user's image history / results
 router.get('/api/v1/users/:userId/dental-images', async (req, res) => {
   try {
-    const images = await getUserImages(req.params.userId);
+    const limit = req.query.limit;
+    const images = await getUserImages(req.params.userId, limit);
     return res.status(200).json({ success: true, data: images });
   } catch (error) {
     console.error('Fetch user history error:', error);
