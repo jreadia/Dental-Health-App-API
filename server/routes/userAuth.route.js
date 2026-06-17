@@ -135,4 +135,46 @@ router.post('/api/v1/auth/users/logout', (req, res) => {
   return res.status(200).json({ success: true, message: 'Logged out successfully' });
 });
 
+router.post('/users/forgot-password', authLimiter, async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const firebaseWebApiKey = process.env.FIREBASE_API_KEY;
+    if (!firebaseWebApiKey) {
+      return res.status(500).json({ error: 'Firebase configuration error' });
+    }
+
+    const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${firebaseWebApiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        requestType: 'PASSWORD_RESET',
+        email,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      const firebaseError = data.error?.message;
+      if (firebaseError === 'EMAIL_NOT_FOUND') {
+        // For security, don't reveal if the email exists or not, just return success
+        // But since this is an internal tool, returning 404 is fine. We will return 200 to prevent enumeration though.
+      } else {
+        return res.status(400).json({ error: 'Failed to send reset email', details: firebaseError });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'If the email exists, a password reset link has been sent.',
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
