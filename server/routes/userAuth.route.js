@@ -2,6 +2,7 @@ import express from 'express';
 import { userSignupSchema, userLoginSchema } from '../schemas/userSchema.js';
 import { signupUser, getUser } from '../services/userService.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
+import { db, auth } from '../config/firebase.js';
 
 const router = express.Router();
 
@@ -147,6 +148,24 @@ router.post('/api/v1/auth/users/forgot-password', authLimiter, async (req, res, 
       return res.status(500).json({ error: 'Firebase configuration error' });
     }
 
+    let isSharedAccount = false;
+    try {
+      const userRecord = await auth.getUserByEmail(email);
+      const uid = userRecord.uid;
+      
+      const [userDoc, adminDoc] = await Promise.all([
+        db.collection('users').doc(uid).get(),
+        db.collection('admins').doc(uid).get()
+      ]);
+      
+      if (userDoc.exists && adminDoc.exists) {
+        isSharedAccount = true;
+      }
+    } catch (e) {
+      // If user doesn't exist, ignore the error and proceed to the Identity Toolkit call
+      // to return a generic success message to prevent email enumeration.
+    }
+
     const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${firebaseWebApiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -162,7 +181,6 @@ router.post('/api/v1/auth/users/forgot-password', authLimiter, async (req, res, 
       const firebaseError = data.error?.message;
       if (firebaseError === 'EMAIL_NOT_FOUND') {
         // For security, don't reveal if the email exists or not, just return success
-        // But since this is an internal tool, returning 404 is fine. We will return 200 to prevent enumeration though.
       } else {
         return res.status(400).json({ error: 'Failed to send reset email', details: firebaseError });
       }
@@ -171,6 +189,7 @@ router.post('/api/v1/auth/users/forgot-password', authLimiter, async (req, res, 
     return res.status(200).json({
       success: true,
       message: 'If the email exists, a password reset link has been sent.',
+      isSharedAccount
     });
   } catch (error) {
     next(error);
