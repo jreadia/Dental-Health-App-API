@@ -97,23 +97,20 @@ const getAllUsers = async (limitNum = 10, cursorId = null, searchQuery = '') => 
 // Get User Stats
 const getUserStats = async () => {
   try {
-    const [totalSnap, inactiveSnap, bannedSnap] = await Promise.all([
+    const [totalSnap, inactiveSnap] = await Promise.all([
       db.collection('users').count().get(),
-      db.collection('users').where('status', '==', 'INACTIVE').count().get(),
-      db.collection('users').where('status', '==', 'BANNED').count().get()
+      db.collection('users').where('status', '==', 'INACTIVE').count().get()
     ]);
 
     const totalCount = totalSnap.data().count;
     const inactiveCount = inactiveSnap.data().count;
-    const bannedCount = bannedSnap.data().count;
-    // Calculate active by subtracting inactive & banned from total
-    const activeCount = totalCount - inactiveCount - bannedCount;
+    // Calculate active by subtracting inactive from total
+    const activeCount = totalCount - inactiveCount;
 
     return {
       total: totalCount,
       active: activeCount,
-      inactive: inactiveCount,
-      banned: bannedCount
+      inactive: inactiveCount
     };
   } catch (error) {
     throw new Error(`Failed to retrieve user stats: ${error.message}`, { cause: error });
