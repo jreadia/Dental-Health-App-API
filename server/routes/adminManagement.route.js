@@ -1,6 +1,6 @@
 import express from 'express';
 import verifyFirebaseToken from '../middleware/token.js';
-import { getAllAdmins, updateAdmin, deleteAdmin, getAdmin } from '../services/adminService.js';
+import { getAllAdmins, updateAdmin, deleteAdmin } from '../services/adminService.js';
 import { adminUpdateSchema } from '../schemas/adminSchema.js';
 
 const router = express.Router();

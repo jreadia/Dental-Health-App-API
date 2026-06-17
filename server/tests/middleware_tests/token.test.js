@@ -68,7 +68,7 @@ describe('verifyFirebaseToken Middleware', () => {
     await verifyFirebaseToken(mockReq, mockRes, mockNext);
 
     expect(auth.verifyIdToken).toHaveBeenCalledWith('valid-token');
-    expect(mockReq.user).toEqual({ uid: 'user123', email: 'test@example.com' });
+    expect(mockReq.user).toEqual({ uid: 'user123', email: 'test@example.com', admin: false });
     expect(mockNext).toHaveBeenCalled();
     expect(mockRes.status).not.toHaveBeenCalled();
   });

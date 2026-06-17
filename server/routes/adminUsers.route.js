@@ -1,6 +1,6 @@
 import express from 'express';
 import verifyFirebaseToken from '../middleware/token.js';
-import { getAdmin } from '../services/adminService.js';
+
 import { getAllUsers, getUserStats, updateUser, deleteUser } from '../services/userService.js';
 import { getUserImages } from '../services/dentalImageService.js';
 
