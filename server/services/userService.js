@@ -129,7 +129,16 @@ const updateUser = async (userId, userData) => {
     // Sync status to Firebase Auth
     if (userData.status) {
       const isDisabled = userData.status === 'INACTIVE' || userData.status === 'BANNED';
-      await auth.updateUser(userId, { disabled: isDisabled });
+      
+      // Check if user is an admin
+      const userRecord = await auth.getUser(userId);
+      const isAdmin = userRecord.customClaims && userRecord.customClaims.admin === true;
+      
+      // Only disable Auth if they are NOT an admin.
+      // If we are activating them, we can safely set disabled to false regardless.
+      if (!isAdmin || !isDisabled) {
+        await auth.updateUser(userId, { disabled: isDisabled });
+      }
     }
     
     return { success: true, userId };
