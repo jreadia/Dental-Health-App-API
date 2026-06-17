@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.use(cookieParser());
-app.set('trust proxy', 1); // Trust the first proxy (Render)
+app.set('trust proxy', 2); // Trust two proxies (Vercel + Render)
 app.use(globalLimiter);
 
 // Routes

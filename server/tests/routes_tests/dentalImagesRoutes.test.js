@@ -37,7 +37,10 @@ jest.unstable_mockModule('../../config/cloudinary.js', () => ({
 // 3. Mock dentalImageService and schema
 jest.unstable_mockModule('../../services/dentalImageService.js', () => ({
   createDentalImage: jest.fn().mockResolvedValue({ success: true, imageId: 'test1234' }),
-  getUserImages: jest.fn().mockResolvedValue([])
+  getUserImages: jest.fn().mockResolvedValue([]),
+  getDentalImage: jest.fn().mockResolvedValue({}),
+  updateDiagnosis: jest.fn().mockResolvedValue({ success: true }),
+  deleteDentalImage: jest.fn().mockResolvedValue({ success: true })
 }));
 
 // 4. Mock axios
