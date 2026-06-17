@@ -10,6 +10,9 @@ export const globalLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: skipIfTest,
+  keyGenerator: (req) => {
+    return req.headers['x-forwarded-for']?.split(',')[0].trim() || req.headers['x-real-ip'] || req.socket.remoteAddress || req.ip;
+  }
 });
 
 // Stricter rate limiter for authentication routes
@@ -20,6 +23,10 @@ export const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: skipIfTest,
+  keyGenerator: (req) => {
+    // Correctly get the user IP when deployed to Vercel/Render
+    return req.headers['x-forwarded-for']?.split(',')[0].trim() || req.headers['x-real-ip'] || req.socket.remoteAddress || req.ip;
+  }
 });
 
 // Stricter rate limiter for ML route
@@ -30,4 +37,7 @@ export const mlLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skip: skipIfTest,
+  keyGenerator: (req) => {
+    return req.headers['x-forwarded-for']?.split(',')[0].trim() || req.headers['x-real-ip'] || req.socket.remoteAddress || req.ip;
+  }
 });
