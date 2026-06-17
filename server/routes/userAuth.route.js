@@ -135,7 +135,7 @@ router.post('/api/v1/auth/users/logout', (req, res) => {
   return res.status(200).json({ success: true, message: 'Logged out successfully' });
 });
 
-router.post('/users/forgot-password', authLimiter, async (req, res, next) => {
+router.post('/api/v1/auth/users/forgot-password', authLimiter, async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!email) {
