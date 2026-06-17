@@ -8,9 +8,12 @@ const router = express.Router();
 // Middleware to verify the user is an admin
 const verifyAdmin = async (req, res, next) => {
   try {
-    const adminId = req.user.uid;
-    await getAdmin(adminId); // Throws if not found
-    next();
+    if (req.user && req.user.admin === true) {
+      next();
+    } else {
+      console.error('Admin verification error: Missing admin claim');
+      return res.status(403).json({ error: 'Access denied: Admin privileges required' });
+    }
   } catch (err) {
     console.error('Admin verification error:', err);
     return res.status(403).json({ error: 'Access denied: Admin privileges required' });
