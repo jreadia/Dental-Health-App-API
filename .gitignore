@@ -62,3 +62,7 @@ schema.dbml
 
 # Ignore FRONTEND.md
 FRONTEND.md
+
+# Ignore frontend tests and sample server
+sample_server/*
+public/*
