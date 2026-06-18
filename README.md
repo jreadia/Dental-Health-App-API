@@ -18,6 +18,7 @@ This project relies on the following core technologies:
 
 ```text
 Dental-Health-App-API/
+├── .github/                            # GitHub Actions workflows for CI/CD
 ├── server/                             # Backend application source code
 │   ├── config/                         # Firebase Admin SDK & Cloudinary config
 │   ├── middleware/                     # Global auth, errors, and upload middleware
